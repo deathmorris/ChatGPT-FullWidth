@@ -1,8 +1,10 @@
 // ==UserScript==
-// @name                ChatGPT FullWidth
-// @name:zh-CN          ChatGPT 全宽模式
+// @name                ChatGPT Widescreen Mode
+// @name:zh-CN          ChatGPT 宽屏模式
+// @description         Adds Widescreen + Fullscreen modes to ChatGPT for enhanced viewing + reduced scrolling
+// @description:zh-CN   向 ChatGPT 添加宽屏 + 全屏模式以增强查看效果 + 减少滚动
 // @author              Quillon
-// @namespace           https://github.com/deathmorris/ChatGPT-FullWidth
+// @namespace           https://github.com/quillon
 // @version             2026.5.25
 // @license             MIT
 // @match               *://chatgpt.com/*
@@ -25,11 +27,11 @@
 
     // Init APP INFO
     const app = {
-        name: 'ChatGPT FullWidth', symbol: '🖥️', configKeyPrefix: site + 'FullWidth',
+        name: 'ChatGPT Widescreen Mode', symbol: '🖥️', configKeyPrefix: site + 'Widescreen',
         urls: {
-            gitHub: 'https://github.com/deathmorris/ChatGPT-FullWidth',
+            gitHub: 'https://github.com/adamlui/chatgpt-widescreen',
             greasyFork: 'https://greasyfork.org/scripts/461473-chatgpt-widescreen-mode',
-            support: 'https://github.com/deathmorris/ChatGPT-FullWidth/issues' },
+            support: 'https://support.chatgptwidescreen.com' },
         latestAssetCommitHash: '3047fa8' // for cached messages.json
     }
     app.urls.assetHost = app.urls.gitHub.replace('github.com', 'cdn.jsdelivr.net/gh') + `@${app.latestAssetCommitHash}/`
@@ -220,7 +222,7 @@
                               'https://www.producthunt.com/products/chatgpt-widescreen-mode/reviews/new') }])
                     document.getElementById(reviewModalID).querySelector('button')
                         .style.display = 'none' }, // hide dismiss button
-                function moreChatGPTapps() { safeWindowOpen('https://github.com/deathmorris') }
+                function moreChatGPTapps() { safeWindowOpen('https://github.com/adamlui/chatgpt-apps') }
             ], '', 478 // set width
         )
 
