@@ -5,12 +5,10 @@
 // @description:zh-CN   向 ChatGPT 添加宽屏 + 全屏模式以增强查看效果 + 减少滚动
 // @author              Quillon
 // @namespace           https://github.com/quillon
-// @version             2026.5.25
+// @version             2026.6.1
 // @license             MIT
 // @match               *://chatgpt.com/*
 // @match               *://chat.openai.com/*
-// @require             https://cdn.jsdelivr.net/npm/@kudoai/chatgpt.js@3.1.0/dist/chatgpt.min.js#sha256-7NZavwKnOeU+AC6WBVJP9kl6BNFlT7go8qSKat7Ey4Y=
-// @connect             cdn.jsdelivr.net
 // @connect             greasyfork.org
 // @grant               GM_setValue
 // @grant               GM_getValue
@@ -36,7 +34,7 @@
     }
     app.urls.assetHost = app.urls.gitHub.replace('github.com', 'cdn.jsdelivr.net/gh') + `@${app.latestAssetCommitHash}/`
     app.urls.update = app.urls.greasyFork.replace('https://', 'https://update.')
-        .replace(/(\d+)-?([a-zA-Z-]*)$/, (_, id, name) => `${id}/${ !name ? 'script' : name }.meta.js`)
+        。replace(/(\d+)-?([a-zA-Z-]*)$/, (_, id, name) => `${id}/${ !name ? 'script' : name }.meta.js`)
 
     // USER ADJUSTABLE: Right margin (px) reserved for third-party plugin buttons (e.g. ChatGPT Exporter)
     // Increase this value if your plugin buttons are being pushed off-screen by the widened layout.
