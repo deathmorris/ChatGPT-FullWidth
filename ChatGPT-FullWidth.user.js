@@ -1,28 +1,28 @@
 // ==UserScript==
-// @name                ChatGPT Widescreen Mode
-// @name:zh-CN          ChatGPT 宽屏模式
-// @description         Adds Widescreen + Fullscreen modes to ChatGPT for enhanced viewing + reduced scrolling
-// @description:zh-CN   向 ChatGPT 添加宽屏 + 全屏模式以增强查看效果 + 减少滚动
-// @author              Quillon
-// @namespace           https://github.com/quillon
-// @version             2026.6.1
-// @license             MIT
-// @match               *://chatgpt.com/*
-// @match               *://chat.openai.com/*
-// @connect             greasyfork.org
-// @grant               GM_setValue
-// @grant               GM_getValue
-// @grant               GM_registerMenuCommand
-// @grant               GM_unregisterMenuCommand
-// @grant               GM_xmlhttpRequest
-// @grant               GM.xmlHttpRequest
+// @name         ChatGPT-FullWidth
+// @name:zh-CN    ChatGPT 宽屏模式
+// @namespace    https://github.com/deathmorris/ChatGPT-FullWidth
+// @version      1.0.4
+// @description  Expand ChatGPT content width and adapt layout to wide screens, reducing scrolling.
+// @description:zh-CN  扩展 ChatGPT 页面内容宽度，自适应宽屏显示，减少滚动次数。
+// @author       Quillon
+// @license      MIT
+// @match        https://chat.openai.com/*
+// @match        https://chatgpt.com/*
+// @grant        GM_setValue
+// @grant        GM_getValue
+// @grant        GM_registerMenuCommand
+// @grant        GM_unregisterMenuCommand
+// @grant        GM_xmlhttpRequest
+// @grant        GM.xmlHttpRequest
+// @require             https://cdn.jsdelivr.net/npm/@kudoai/chatgpt.js@3.1.0/dist/chatgpt.min.js#sha2567NZavwKnOeU+AC6WBVJP9kl6BNFlT7go8qSKat7Ey4Y=
 // @noframes
 // ==/UserScript==
-
+ 
 (async () => { /* global newChatBtn, wideScreenBtn, fullWindowBtn, fullScreenBtn */
-
+ 
     const site = new URL(location.href).hostname.split('.').slice(-2, -1)[0]
-
+ 
     // Init APP INFO
     const app = {
         name: 'ChatGPT Widescreen Mode', symbol: '🖥️', configKeyPrefix: site + 'Widescreen',
@@ -34,22 +34,22 @@
     }
     app.urls.assetHost = app.urls.gitHub.replace('github.com', 'cdn.jsdelivr.net/gh') + `@${app.latestAssetCommitHash}/`
     app.urls.update = app.urls.greasyFork.replace('https://', 'https://update.')
-        。replace(/(\d+)-?([a-zA-Z-]*)$/, (_, id, name) => `${id}/${ !name ? 'script' : name }.meta.js`)
-
+        .replace(/(\d+)-?([a-zA-Z-]*)$/, (_, id, name) => `${id}/${ !name ? 'script' : name }.meta.js`)
+ 
     // USER ADJUSTABLE: Right margin (px) reserved for third-party plugin buttons (e.g. ChatGPT Exporter)
     // Increase this value if your plugin buttons are being pushed off-screen by the widened layout.
     // Set to 0 if you don't have any right-side plugin buttons.
     const PLUGIN_RIGHT_MARGIN = 130 // px — change this to match your plugin button width
-
+ 
     // Init CONFIG
     const config = { userLanguage: chatgpt.getUserLanguage() }
     loadSetting('autoFocusChatbarDisabled', 'fullerWindows', 'fullWindow', 'hiddenFooter', 'hiddenHeader',
                 'notifDisabled', 'ncbDisabled', 'tcbDisabled', 'widerChatbox', 'wideScreen')
     config.autoAdaptive = GM_getValue(`${app.configKeyPrefix}_${site}_autoAdaptive`, true) // default ON
-
+ 
     // Init FETCHER
     const xhr = getUserscriptManager() == 'OrangeMonkey' ? GM_xmlhttpRequest : GM.xmlHttpRequest
-
+ 
     // Define MESSAGES
     const msgsLoaded = new Promise(resolve => {
         const msgHostDir = app.urls.assetHost + 'greasemonkey/_locales/',
@@ -72,18 +72,18 @@
             }
         }
     }) ; const msgs = await msgsLoaded
-
+ 
     // Define SCRIPT functions
-
+ 
     function loadSetting(...keys) { keys.forEach(key => config[key] = GM_getValue(`${ app.configKeyPrefix }_${ site }_${ key }`, false)) }
     function saveSetting(key, value) { GM_setValue(`${ app.configKeyPrefix }_${ site }_${ key }`, value) ; config[key] = value }
     function safeWindowOpen(url) { window.open(url, '_blank', 'noopener') } // to prevent backdoor vulnerabilities
     function getUserscriptManager() { try { return GM_info.scriptHandler } catch (err) { return 'other' }}
-
+ 
     // Define MENU functions
-
+ 
     function registerMenu() {
-
+ 
         // Add command to also activate wide screen in full-window
         const fwLabel = menuState.symbol[+config.fullerWindows] + ' '
                       + ( msgs.menuLabel_fullerWins || 'Fuller Windows' )
@@ -95,7 +95,7 @@
                 `${ ( msgs.menuLabel_fullerWins || 'Fuller Windows' ) }: ${ menuState.word[+config.fullerWindows] }`)
             refreshMenu()
         }))
-
+ 
         // Add command to toggle taller chatbox when typing
         const tcbLabel = '↕️ ' + ( msgs.menuLabel_tallerChatbox || 'Taller Chatbox' )
                        + menuState.separator + menuState.word[+!config.tcbDisabled]
@@ -106,7 +106,7 @@
                 `${ msgs.menuLabel_tallerChatbox || 'Taller Chatbox' }: ${ menuState.word[+!config.tcbDisabled] }`)
             refreshMenu()
         }))
-
+ 
         // Add command to hide New Chat button
         const hncLabel = menuState.symbol[+!config.ncbDisabled] + ' '
                        + ( msgs.menuLabel_newChatBtn || 'New Chat Button' )
@@ -117,9 +117,9 @@
             notify(`${ msgs.menuLabel_newChatBtn || 'New Chat Button' }: ${ menuState.word[+!config.ncbDisabled] }`)
             refreshMenu()
         }))
-
+ 
         if (/chatgpt|openai/.test(site)) {
-
+ 
             // Add command to toggle Auto-Focus Chatbar
             const afcLabel = menuState.symbol[+!config.autoFocusChatbarDisabled] + ' '
                            + ( msgs.menuLabel_autoFocusChatbar || 'Auto-Focus Chatbar' ) + ' '
@@ -131,7 +131,7 @@
                 if (!config.autoFocusChatbarDisabled) document.querySelector(inputSelector)?.focus()
                 refreshMenu()
             }))
-
+ 
             // Add command to toggle hidden header
             const hhLabel = menuState.symbol[+config.hiddenHeader] + ' '
                           + ( msgs.menuLabel_hiddenHeader || 'Hidden Header' )
@@ -143,7 +143,7 @@
                     `${ msgs.menuLabel_hiddenHeader || 'Hidden Header' }: ${ menuState.word[+config.hiddenHeader] }`)
                 refreshMenu()
             }))
-
+ 
             // Add command to toggle hidden footer
             const hfLabel = menuState.symbol[+config.hiddenFooter] + ' '
                           + ( msgs.menuLabel_hiddenFooter || 'Hidden Footer' )
@@ -156,7 +156,7 @@
                 refreshMenu()
             }))
         }
-
+ 
         // Add command to show notifications when switching modes
         const mnLabel = menuState.symbol[+!config.notifDisabled] + ' '
                       + ( msgs.menuLabel_modeNotifs || 'Mode Notifications' )
@@ -166,7 +166,7 @@
             notify(`${ msgs.menuLabel_modeNotifs || 'Mode Notifications' }: ${ menuState.word[+!config.notifDisabled] }`)
             refreshMenu()
         }))
-
+ 
         // Add command to toggle Auto-Adaptive mode
         const aaLabel = '🖥️ Auto-Adaptive' + menuState.separator + menuState.word[+config.autoAdaptive]
         menuIDs.push(GM_registerMenuCommand(aaLabel, () => {
@@ -181,19 +181,19 @@
             if (!config.notifDisabled) notify(`Auto-Adaptive: ${menuState.word[+config.autoAdaptive]}`)
             refreshMenu()
         }))
-
+ 
         // Add command to launch About modal
         const amLabel = `💡 ${ msgs.menuLabel_about || 'About' } ${ msgs.appName || app.name }`
         menuIDs.push(GM_registerMenuCommand(amLabel, launchAboutModal))
     }
-
+ 
     function refreshMenu() {
         if (getUserscriptManager() == 'OrangeMonkey') return
         for (const id of menuIDs) { GM_unregisterMenuCommand(id) } registerMenu()
     }
-
+ 
     function launchAboutModal() {
-
+ 
         // Show alert
         const chatgptJSver = (/chatgpt-([\d.]+)\.min/.exec(GM_info.script.header) || [null, ''])[1],
               headingStyle = 'font-size: 1.15rem',
@@ -223,7 +223,7 @@
                 function moreChatGPTapps() { safeWindowOpen('https://github.com/adamlui/chatgpt-apps') }
             ], '', 478 // set width
         )
-
+ 
         // Re-format buttons to include emoji + localized label + hide Dismiss button
         for (const button of document.getElementById(aboutModalID).querySelectorAll('button')) {
             if (/updates/i.test(button.textContent)) button.textContent = (
@@ -237,16 +237,16 @@
             else button.style.display = 'none' // hide Dismiss button
         }
     }
-
+ 
     function updateCheck() {
-
+ 
         // Fetch latest meta
         const currentVer = GM_info.script.version
         xhr({
             method: 'GET', url: app.urls.update + '?t=' + Date.now(),
             headers: { 'Cache-Control': 'no-cache' },
             onload: response => { const updateAlertWidth = 377
-
+ 
                 // Compare versions
                 const latestVer = /@version +(.*)/.exec(response.responseText)[1]
                 for (let i = 0 ; i < 4 ; i++) { // loop thru subver's
@@ -254,7 +254,7 @@
                           latestSubVer = parseInt(latestVer.split('.')[i], 10) || 0
                     if (currentSubVer > latestSubVer) break // out of comparison since not outdated
                     else if (latestSubVer > currentSubVer) { // if outdated
-
+ 
                         // Alert to update
                         const updateModalID = siteAlert(`🚀 ${ msgs.alert_updateAvail || 'Update available' }!`, // title
                             `${ msgs.alert_newerVer || 'An update to' } ${ app.name } `
@@ -268,7 +268,7 @@
                                 safeWindowOpen(app.urls.update.replace('meta.js', 'user.js') + '?t=' + Date.now())
                             }, '', updateAlertWidth
                         )
-
+ 
                         // Localize button labels if needed
                         if (!config.userLanguage.startsWith('en')) {
                             const updateAlert = document.querySelector(`[id="${ updateModalID }"]`),
@@ -276,10 +276,10 @@
                             updateBtns[1].textContent = msgs.btnLabel_update || 'Update'
                             updateBtns[0].textContent = msgs.btnLabel_dismiss || 'Dismiss'
                         }
-
+ 
                         return
                 }}
-
+ 
                 // Alert to no update, return to About modal
                 siteAlert(( msgs.alert_upToDate || 'Up-to-date' ) + '!', // title
                     `${ msgs.appName || app.name } (v${ currentVer }) ` // msg
@@ -288,19 +288,19 @@
                 )
                 launchAboutModal()
     }})}
-
+ 
     // Define FEEDBACK functions
-
+ 
     function notify(msg, position = '', notifDuration = '', shadow = '') {
-
+ 
         // Strip state word to append colored one later
         const foundState = menuState.word.find(word => msg.includes(word))
         if (foundState) msg = msg.replace(foundState, '')
-
+ 
         // Show notification
         chatgpt.notify(`${app.symbol} ${msg}`, position, notifDuration, shadow || chatgpt.isDarkMode() ? '' : 'shadow')
         const notif = document.querySelector('.chatgpt-notif:last-child')
-
+ 
         // Append styled state word
         if (foundState) {
             const styledState = document.createElement('span')
@@ -310,23 +310,23 @@
             styledState.append(foundState) ; notif.append(styledState)
         }
     }
-
+ 
     function siteAlert(title = '', msg = '', btns = '', checkbox = '', width = '') {
         return chatgpt.alert(title, msg, btns, checkbox, width )}
-
+ 
     // Define BUTTON functions
-
+ 
     function setBtnColor() {
         return chatgpt.isDarkMode() ? 'white' : '#202123'
     }
-
+ 
     function insertBtns() {
-
+ 
         // Find the composer's trailing area where send/voice buttons live
         const trailingArea = document.querySelector('[style*="grid-area:trailing"], [class*="trailing"]')
             || document.querySelector('form button[aria-label*="发送"], form button[data-testid="composer-speech-button"]')?.parentNode?.parentNode
         if (!trailingArea || trailingArea.contains(wideScreenBtn)) return
-
+ 
         // Insert buttons into trailing area, before existing buttons
         const firstTrailingChild = trailingArea.firstElementChild
         const elemsToInsert = [newChatBtn, wideScreenBtn, fullWindowBtn, fullScreenBtn, tooltipDiv]
@@ -335,9 +335,9 @@
                 trailingArea.insertBefore(elem, firstTrailingChild)
         })
     }
-
+ 
     function updateBtnSVG(mode, state = '') {
-
+ 
         // Define SVG viewbox + elems
         const svgViewBox = ( mode == 'newChat' ? '11 6 ' : mode == 'fullWindow' ? '-2 -0.5 ' : '8 8 ' ) // move to XY coords to crop whitespace
                          + ( mode == 'newChat' ? '13 13' : mode == 'fullWindow' ? '24 24' : '20 20' ) // shrink to fit size
@@ -361,14 +361,14 @@
             createSVGelem('path', { fill: btnColor, 'fill-rule': 'evenodd',
                 d: 'm28,11 0,14 -20,0 0,-14 z m-18,2 16,0 0,10 -16,0 0,-10 z' }) ]
         const newChatElems = [ createSVGelem('path', { fill: btnColor, d: 'M22,13h-4v4h-2v-4h-4v-2h4V7h2v4h4V13z' }) ]
-
+ 
         // Pick appropriate button/elements
         const [button, ONelems, OFFelems] = (
             mode == 'fullScreen' ? [fullScreenBtn, fullScreenONelems, fullScreenOFFelems]
           : mode == 'fullWindow' ? [fullWindowBtn, fullWindowElems, fullWindowElems]
           : mode == 'wideScreen' ? [wideScreenBtn, wideScreenONelems, wideScreenOFFelems]
                                  : [newChatBtn, newChatElems, newChatElems])
-
+ 
         // Set SVG attributes
         const buttonSVG = button.querySelector('svg') || document.createElementNS('http://www.w3.org/2000/svg', 'svg')
         buttonSVG.setAttribute('height', 18) // prevent shrinking
@@ -382,29 +382,29 @@
         buttonSVG.setAttribute('viewBox', svgViewBox)
         buttonSVG.style.pointerEvents = 'none'
         buttonSVG.style.height = buttonSVG.style.width = '1.25rem'
-
+ 
         // Update SVG elements
         while (buttonSVG.firstChild) { buttonSVG.removeChild(buttonSVG.firstChild) }
         const svgElems = config[mode] || state.toLowerCase() == 'on' ? ONelems : OFFelems
         svgElems.forEach(elem => buttonSVG.append(elem))
-
+ 
         // Update SVG
         if (!button.contains(buttonSVG)) button.append(buttonSVG)
     }
-
+ 
     function createSVGelem(tagName, attributes) {
         const elem = document.createElementNS('http://www.w3.org/2000/svg', tagName)
         for (const attr in attributes) elem.setAttributeNS(null, attr, attributes[attr])
         return elem
     }
-
+ 
     // Define TOOLTIP functions
-
+ 
     function toggleTooltip(event) {
         updateTooltip(event.currentTarget.id.replace(/-button$/, ''))
         tooltipDiv.style.opacity = event.type == 'mouseover' ? '1' : '0'
     }
-
+ 
     function updateTooltip(buttonType) { // text & position
         tooltipDiv.innerText = msgs['tooltip_' + buttonType + (
             !/full|wide/i.test(buttonType) ? '' : (config[buttonType] ? 'OFF' : 'ON'))]
@@ -415,9 +415,9 @@
         tooltipDiv.style.right = `${
             iniRoffset - tooltipDiv.getBoundingClientRect().width /2 }px`
     }
-
+ 
     // Define TOGGLE functions
-
+ 
     function activateMode(mode) {
         if (mode == 'wideScreen') { document.head.append(wideScreenStyle) ; syncMode('wideScreen') }
         else if (mode == 'fullWindow') {
@@ -426,7 +426,7 @@
             document.querySelector('[data-testid="close-sidebar-button"]')?.click()
         } else if (mode == 'fullScreen') document.documentElement.requestFullscreen()
     }
-
+ 
     function deactivateMode(mode) {
         if (mode == 'wideScreen')
             try { document.head.removeChild(wideScreenStyle) ; syncMode('wideScreen') } catch (err) {}
@@ -442,7 +442,7 @@
             document.exitFullscreen().catch(err => console.error(app.symbol + ' » Failed to exit fullscreen', err))
         }
     }
-
+ 
     function toggleMode(mode, state = '') {
         switch (state.toUpperCase()) {
             case 'ON' : activateMode(mode) ; break
@@ -450,14 +450,14 @@
             default : config[mode] ? deactivateMode(mode) : activateMode(mode)
         }
     }
-
+ 
     // Define SYNC functions
-
+ 
     function isFullWindow() {
         const sidebar = document.getElementById('stage-slideover-sidebar')
         return sidebar ? getComputedStyle(sidebar).display === 'none' : false
     }
-
+ 
     function syncMode(mode) { // setting + icon + tooltip
         const state = ( mode == 'wideScreen' ? !!document.getElementById('wideScreen-mode')
                       : mode == 'fullWindow' ? isFullWindow()
@@ -468,7 +468,7 @@
             notify(`${ msgs['mode_' + mode] } ${ state ? 'ON' : 'OFF' }`)
         config.modeSynced = true ; setTimeout(() => config.modeSynced = false, 100) // prevent repetition
     }
-
+ 
     function syncFullerWindows(fullWindowState) {
         if (fullWindowState && config.fullerWindows && !config.wideScreen) { // activate fuller windows
             document.head.append(wideScreenStyle) ; updateBtnSVG('wideScreen', 'on')
@@ -478,9 +478,9 @@
                 try { document.head.removeChild(wideScreenStyle) } catch (err) {}
                 updateBtnSVG('wideScreen', 'off')
     }}}
-
+ 
     let prevScreenProfile = '' // track screen changes for adaptive switching
-
+ 
     // Adaptive screen detection for multi-monitor setups
     function detectScreenProfile() {
         const w = window.screen.width, h = window.screen.height, ratio = w / h
@@ -488,11 +488,11 @@
         if (ratio < 1.0) return 'portrait'     // vertical/portrait monitor
         return 'standard'                       // 16:9 or 16:10 normal landscape
     }
-
+ 
     const adaptiveStyle = document.createElement('style')
     adaptiveStyle.id = 'adaptive-width'
     document.head.append(adaptiveStyle)
-
+ 
     function applyAdaptiveWidth(profile) {
         let maxWidth
         switch (profile) {
@@ -503,13 +503,13 @@
         adaptiveStyle.innerText =
             `[class*="thread-content-max-width"] { --thread-content-max-width: ${maxWidth} !important; max-width: ${maxWidth} !important }`
     }
-
+ 
     // Initial adaptive application
     if (config.autoAdaptive !== false) {
         prevScreenProfile = detectScreenProfile()
         applyAdaptiveWidth(prevScreenProfile)
     }
-
+ 
     function updateTweaksStyle() {
         tweaksStyle.innerText =
             ( '[id$="-button"]:hover { opacity: 80% !important }' )
@@ -518,7 +518,7 @@
           + ( !config.tcbDisabled ? tcbStyle : '' )
           + `#newChat-button { display: ${ config.ncbDisabled ? 'none' : 'flex' }}`
     }
-
+ 
     function updateWidescreenStyle() {
         // Override ChatGPT's CSS variable-based width limit (2026 UI)
         wideScreenStyle.innerText =
@@ -527,30 +527,30 @@
           + '.max-w-\\[--thread-content-max-width\\] { max-width: 100% !important }'
         if (config.widerChatbox) wideScreenStyle.innerText += wcbStyle
     }
-
+ 
     function updateComposerMarginStyle() {
         // Reserve right space on composer ONLY, not the entire thread content
         composerMarginStyle.innerText = PLUGIN_RIGHT_MARGIN > 0
             ? `#thread-bottom-container { padding-right: ${PLUGIN_RIGHT_MARGIN}px !important }`
             : ''
     }
-
+ 
     // Run MAIN routine
-
+ 
     // Init MENU objs
     const menuIDs = [] // to store registered cmds for removal while preserving order
     const menuState = {
         symbol: ['❌', '✔️'], word: ['OFF', 'ON'],
         separator: getUserscriptManager() == 'Tampermonkey' ? ' — ' : ': '
     }
-
+ 
     // Define UI element SELECTORS (updated for 2026 ChatGPT UI)
     const inputSelector = '#prompt-textarea',
           sidebarSelector = '#stage-slideover-sidebar',
           sidepadSelector = 'main#main',
           headerSelector = 'header#page-header, header[data-fixed-header]'
     let footerSelector = '[class*="disclaimer"]'
-
+ 
     // Create browser TOOLBAR MENU or DISABLE SCRIPT if extension installed
     const extensionInstalled = await Promise.race([
         new Promise(resolve => {
@@ -564,7 +564,7 @@
             () => { return }) // disable menu
         return // exit script
     } else registerMenu() // create functional menu
-
+ 
     // AUTO-FOCUS ChatGPT chatbar if enabled
     if (/chatgpt|openai/.test(site) && !config.autoFocusChatbarDisabled) {
         await Promise.race([
@@ -577,11 +577,11 @@
         ])
         document.querySelector(inputSelector)?.focus()
     }
-
+ 
     // Save FULL-WINDOW + FULL SCREEN states
     config.fullWindow = isFullWindow()
     config.fullScreen = chatgpt.isFullScreen()
-
+ 
     // Stylize ALERTS
     if (!document.getElementById('chatgpt-alert-override-style')) {
         const chatgptAlertStyle = document.createElement('style')
@@ -596,7 +596,7 @@
         )
         document.head.append(chatgptAlertStyle)
     }
-
+ 
     // Create/stylize TOOLTIP div
     const tooltipDiv = document.createElement('div')
     tooltipDiv.classList.add('toggle-tooltip')
@@ -609,7 +609,7 @@
         + 'opacity: 0 ; transition: opacity 0.1s ; z-index: 9999 ;' // visibility
         + '-webkit-user-select: none ; -moz-user-select: none ; -ms-user-select: none ; user-select: none }' // disable select
     document.head.append(tooltipStyle)
-
+ 
     // Create/apply general style TWEAKS
     const tweaksStyle = document.createElement('style'),
           tcbStyle = inputSelector + '{ max-height: 68vh !important }', // heighten chatbox
@@ -618,26 +618,26 @@
           hfStyle = footerSelector + '{ color: transparent !important ;' // hide footer text
                                    + '  padding: .1rem 0 0 !important }' // reduce v-padding
     updateTweaksStyle() ; document.head.append(tweaksStyle)
-
+ 
     // Create WIDESCREEN style
     const wideScreenStyle = document.createElement('style')
     wideScreenStyle.id = 'wideScreen-mode' // for syncMode()
     const wcbStyle = 'form.group\\/composer { max-width: 96% !important }' // Wider Chatbox
     updateWidescreenStyle()
-
+ 
     // Create COMPOSER right margin style (only affects the input area, not the whole thread)
     const composerMarginStyle = document.createElement('style')
     composerMarginStyle.id = 'composer-right-margin'
     updateComposerMarginStyle()
     document.head.append(composerMarginStyle)
-
+ 
     // Create FULL-WINDOW style
     const fullWindowStyle = document.createElement('style')
     fullWindowStyle.id = 'fullWindow-mode' // for syncMode()
     fullWindowStyle.innerText = (
           sidebarSelector + '{ display: none }' // hide sidebar
         + sidepadSelector + '{ padding-left: 0 }' ) // remove side padding
-
+ 
     // Create/insert chatbar BUTTONS
     const buttonTypes = ['fullScreen', 'fullWindow', 'wideScreen', 'newChat']
     let btnColor = setBtnColor()
@@ -669,14 +669,14 @@
             }
             window[buttonName].onmouseover = toggleTooltip
             window[buttonName].onmouseout = toggleTooltip
-
+ 
         })(buttonTypes[i])
     } insertBtns()
-
+ 
     // Monitor NODE CHANGES to auto-toggle once + maintain button visibility + update colors
     let prevSessionChecked = false
     const nodeObserver = new MutationObserver(([mutation]) => {
-
+ 
         // Check loaded keys to restore previous session's state
         if (!prevSessionChecked) {
             if (config.wideScreen) toggleMode('wideScreen', 'ON')
@@ -688,9 +688,9 @@
             }}
             if (config.tcbDisabled) updateTweaksStyle() ; prevSessionChecked = true
         }
-
+ 
         insertBtns() // re-insert buttons as they disappear during SPA navigation
-
+ 
         // Update button SVG colors on theme toggle
         if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
             btnColor = setBtnColor()
@@ -699,7 +699,7 @@
     })
     nodeObserver.observe(document.documentElement, { attributes: true }) // <html> for page scheme toggles
     nodeObserver.observe(document.querySelector('main'), { attributes: true, subtree: true }); // <main> for chatbar changes
-
+ 
     // Monitor SIDEBAR to update full-window setting
     const sidebarObserver = new MutationObserver(() => {
         const fullWindowState = isFullWindow()
@@ -709,13 +709,13 @@
     setTimeout(() =>
         sidebarObserver.observe(document.body, {
             subtree: true, childList: false, attributes: true }), 500)
-
+ 
     // Add RESIZE/ADAPTIVE LISTENER
     window.onresize = () => {
         const fullScreenState = chatgpt.isFullScreen()
         if (config.fullScreen && !fullScreenState) { syncMode('fullScreen') ; config.f11 = false }
         else if (!config.fullScreen && fullScreenState) syncMode('fullScreen')
-
+ 
         // Adaptive: check if screen profile changed (window moved between monitors)
         if (config.autoAdaptive !== false) {
             const newProfile = detectScreenProfile()
@@ -727,11 +727,11 @@
             }
         }
     }
-
+ 
     // Add KEY LISTENER to enable flag on F11 + stop generating text on ESC
     window.onkeydown = event => {
         if ((event.key == 'F11' || event.keyCode == 122) && !config.fullScreen) config.f11 = true
         else if ((event.key == 'Escape' || event.keyCode == 27) && !chatgpt.isIdle()) chatgpt.stop()
     }
-
+ 
 })()
