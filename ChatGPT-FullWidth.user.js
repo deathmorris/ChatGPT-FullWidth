@@ -2,7 +2,7 @@
 // @name         ChatGPT-FullWidth
 // @name:zh-CN    ChatGPT 宽屏模式
 // @namespace    https://github.com/deathmorris/ChatGPT-FullWidth
-// @version      1.0.7
+// @version      1.0.8
 // @description  Expand ChatGPT content width and adapt layout to wide screens, reducing scrolling.
 // @description:zh-CN  扩展 ChatGPT 页面内容宽度，自适应宽屏显示，减少滚动次数。
 // @author       Quillon
