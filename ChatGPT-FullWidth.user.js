@@ -2,7 +2,7 @@
 // @name         ChatGPT-FullWidth
 // @name:zh-CN    ChatGPT 宽屏模式
 // @namespace    https://github.com/deathmorris/ChatGPT-FullWidth
-// @version      1.0.4
+// @version      1.0.5
 // @description  Expand ChatGPT content width and adapt layout to wide screens, reducing scrolling.
 // @description:zh-CN  扩展 ChatGPT 页面内容宽度，自适应宽屏显示，减少滚动次数。
 // @author       Quillon
@@ -525,6 +525,10 @@
             '[class*="thread-content-max-width"] { --thread-content-max-width: 100% !important; max-width: 100% !important }'
           + '.text-base.mx-auto { max-width: 100% !important }'
           + '.max-w-\\[--thread-content-max-width\\] { max-width: 100% !important }'
+          // 约束markdown表格溢出容器，防止表格撑破内容区、贴边到最左侧
+          // ChatGPT用overflow-x:auto的div包裹表格，该div需要max-width限制才能不突破父容器
+          + '[class*="thread-content-max-width"] [class*="overflow-x-auto"] { max-width: 100% !important }'
+          + '[class*="thread-content-max-width"] table { max-width: 100% !important; table-layout: auto }'
         if (config.widerChatbox) wideScreenStyle.innerText += wcbStyle
     }
  
