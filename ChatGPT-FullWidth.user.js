@@ -2,7 +2,7 @@
 // @name         ChatGPT-FullWidth
 // @name:zh-CN    ChatGPT 宽屏模式
 // @namespace    https://github.com/deathmorris/ChatGPT-FullWidth
-// @version      1.0.5
+// @version      1.0.6
 // @description  Expand ChatGPT content width and adapt layout to wide screens, reducing scrolling.
 // @description:zh-CN  扩展 ChatGPT 页面内容宽度，自适应宽屏显示，减少滚动次数。
 // @author       Quillon
@@ -521,14 +521,17 @@
  
     function updateWidescreenStyle() {
         // Override ChatGPT's CSS variable-based width limit (2026 UI)
+        // --thread-content-max-width: 主内容区最大宽度
+        // --thread-content-width: 表格的min-width引用变量（与上面是两个独立变量，必须同时覆盖）
         wideScreenStyle.innerText =
-            '[class*="thread-content-max-width"] { --thread-content-max-width: 100% !important; max-width: 100% !important }'
+            '[class*="thread-content-max-width"] { --thread-content-max-width: 100% !important; --thread-content-width: 100% !important; max-width: 100% !important }'
           + '.text-base.mx-auto { max-width: 100% !important }'
           + '.max-w-\\[--thread-content-max-width\\] { max-width: 100% !important }'
-          // 约束markdown表格溢出容器，防止表格撑破内容区、贴边到最左侧
-          // ChatGPT用overflow-x:auto的div包裹表格，该div需要max-width限制才能不突破父容器
-          + '[class*="thread-content-max-width"] [class*="overflow-x-auto"] { max-width: 100% !important }'
-          + '[class*="thread-content-max-width"] table { max-width: 100% !important; table-layout: auto }'
+          // 约束表格外层容器，防止w-fit撑破布局导致表格贴边
+          + '[class*="tableContainer"] { max-width: 100% !important; overflow-x: auto !important }'
+          + '[class*="tableWrapper"] { max-width: 100% !important }'
+          // 解除表格的min-width强制约束，让窄表不无故撑满、宽表在容器内滚动
+          + 'table[class*="min-w-"] { min-width: unset !important; max-width: 100% !important }'
         if (config.widerChatbox) wideScreenStyle.innerText += wcbStyle
     }
  
